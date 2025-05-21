@@ -1,5 +1,26 @@
 ﻿@page "/"
-
-<h1>Hello, world!</h1>
-
-Welcome to your new app.
+<SectionContent SectionName="page-buttons">
+    <div id="searchBox" class="input-group header-search" style="display:none;">
+        <span class="input-group-text text-warning"><i class="fa fa-search"></i></span>
+        <input id="txtSearch" type="text" class="form-control" placeholder="Search" value="@Model.Search" @onchange="SearchTerm" />
+        <span class="input-group-text" onclick="hideSearchBox()"><i class="fa fa-times"></i></span>
+    </div>
+    <span id="controlBox">
+        <button class="btn text-warning" onclick="showSearchBox()">
+            <i class="fa fa-search"></i>
+        </button>
+    </span>    
+</SectionContent>
+<section>
+    <h1>Welcome</h1>
+</section>
+<script>
+    function showSearchBox(){
+        $('#searchBox').show();
+        $('#controlBox').hide();
+    }
+    function hideSearchBox(){
+        $('#searchBox').hide();
+        $('#controlBox').show();
+    }
+</script>

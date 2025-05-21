@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using MobSysFinalsBase1.Shared;
 
 namespace MobSysFinalsBase1
 {
@@ -20,7 +21,8 @@ namespace MobSysFinalsBase1
     		builder.Services.AddBlazorWebViewDeveloperTools();
     		builder.Logging.AddDebug();
 #endif
-
+            builder.Services.AddSingleton<AppShellContext>();
+            builder.Services.AddSingleton<DatabaseContext>();
             return builder.Build();
         }
     }
