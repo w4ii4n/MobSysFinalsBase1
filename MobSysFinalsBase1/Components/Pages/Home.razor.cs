@@ -25,6 +25,7 @@ namespace MobSysFinalsBase1.Components.Pages
         public List<string> BookGenres;
         public List<BookInfo> BooksForPage;
         public BookInfo SelectedBook { get; set; }
+        public bool IsBookFavourited { get; set; }
 
         protected override async void OnInitialized()
         {
@@ -110,21 +111,72 @@ namespace MobSysFinalsBase1.Components.Pages
             }
         }
 
-        public void ShowDetails(BookInfo book)
+        public async void ShowDetails(BookInfo book)
         {
             SelectedBook = book;
+            var user = AppShell.GetSessionUser();
+            if (user != null)
+            {
+                var fav = await DB.GetFavourite(user.ID, book.Title, book.Author);
+                IsBookFavourited = fav != null;
+            }
+            else
+            {
+                IsBookFavourited = false;
+            }
             StateHasChanged();
         }
+
         public void CloseDetails()
         {
             SelectedBook = null;
             StateHasChanged();
         }
+
         public void OpenAmazon()
         {
             if (SelectedBook == null) return;
             var amazonLink = $"https://www.amazon.com/s?k={Uri.EscapeDataString(SelectedBook.Title + " " + SelectedBook.Author)}&i=stripbooks";
             Nav.NavigateTo(amazonLink, true);
+        }
+
+        public async void AddToFavourites()
+        {
+            var user = AppShell.GetSessionUser();
+            if (user != null && SelectedBook != null)
+            {
+                var fav = new Favourite
+                {
+                    UserID = user.ID,
+                    Title = SelectedBook.Title,
+                    Author = SelectedBook.Author,
+                    PublishedDate = SelectedBook.PublishedDate,
+                    Genre = SelectedBook.Genre,
+                    Description = SelectedBook.Description,
+                    AmazonLink = $"https://www.amazon.com/s?k={Uri.EscapeDataString(SelectedBook.Title + " " + SelectedBook.Author)}&i=stripbooks",
+                    Thumbnail = SelectedBook.Thumbnail,
+                    SmallThumbnail = SelectedBook.SmallThumbnail,
+                    AddedDate = DateTime.Now
+                };
+                await DB.AddFavourite(fav);
+                IsBookFavourited = true;
+                StateHasChanged();
+            }
+        }
+
+        public async void RemoveFromFavourites()
+        {
+            var user = AppShell.GetSessionUser();
+            if (user != null && SelectedBook != null)
+            {
+                var fav = await DB.GetFavourite(user.ID, SelectedBook.Title, SelectedBook.Author);
+                if (fav != null)
+                {
+                    await DB.RemoveFavourite(fav.ID);
+                    IsBookFavourited = false;
+                    StateHasChanged();
+                }
+            }
         }
     }
 }

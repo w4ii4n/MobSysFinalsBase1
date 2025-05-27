@@ -34,7 +34,7 @@ namespace MobSysFinalsBase1.Shared
             database = new SQLiteAsyncConnection(Constants.DatabasePath, Constants.Flags);
             //Create tables
             await database.CreateTableAsync<User>();
-
+            await database.CreateTableAsync<Favourite>();
         }
 
         public async Task<List<User>> Users()
@@ -56,6 +56,36 @@ namespace MobSysFinalsBase1.Shared
         {
             await Init();
             return await database.DeleteAsync(incoming);
+        }
+
+        // Get all favourites for a specific user
+        public async Task<List<Favourite>> GetFavourites(int userId)
+        {
+            await Init();
+            return await database.Table<Favourite>().Where(f => f.UserID == userId).ToListAsync();
+        }
+
+        // Add a favourite
+        public async Task<int> AddFavourite(Favourite favourite)
+        {
+            await Init();
+            return await database.InsertAsync(favourite);
+        }
+
+        // Remove a favourite by its ID
+        public async Task<int> RemoveFavourite(int id)
+        {
+            await Init();
+            return await database.DeleteAsync<Favourite>(id);
+        }
+
+        // Get a specific favourite by user id, title, and author
+        public async Task<Favourite> GetFavourite(int userId, string title, string author)
+        {
+            await Init();
+            return await database.Table<Favourite>()
+                .Where(f => f.UserID == userId && f.Title == title && f.Author == author)
+                .FirstOrDefaultAsync();
         }
     }
 }

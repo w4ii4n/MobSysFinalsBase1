@@ -1,0 +1,100 @@
+﻿@page "/favourites"
+@inherits MobSysFinalsBase1.Components.Pages.FavouritesPage
+
+<h2>Your Favourites (@(Favourites?.Count ?? 0))</h2>
+
+<div class="d-flex justify-content-end mb-3">
+    <button class="btn btn-outline-secondary me-1" disabled="@IsGridView" @onclick="()=>SetGrid(true)">
+        <i class="fa fa-th"></i> Grid
+    </button>
+    <button class="btn btn-outline-secondary" disabled="@(IsGridView == false)" @onclick="()=>SetGrid(false)">
+        <i class="fa fa-list"></i> List
+    </button>
+</div>
+
+@if (IsLoading)
+{
+    <p>Loading favourites...</p>
+}
+else if (Favourites == null || Favourites.Count == 0)
+{
+    <p>You have no favourites.</p>
+}
+else
+{
+    @if (IsGridView)
+    {
+        <div class="favourites-grid">
+            @foreach (var fav in Favourites)
+            {
+                <div class="favourite-card clickable" @onclick="@(() => ShowDetails(fav))">
+                    <img src="@fav.Thumbnail" alt="@fav.Title" class="fav-thumb" />
+                    <div class="title">@fav.Title</div>
+                    <div class="author">@fav.Author</div>
+                    <div class="mt-2">
+                        <button class="btn btn-link btn-sm" @onclick:stopPropagation @onclick="@(() => OpenAmazon(fav))">
+                            <i class="fa fa-amazon"></i> Buy
+                        </button>
+                        <button class="btn btn-link btn-sm text-danger" @onclick:stopPropagation @onclick="@(() => RemoveFavourite(fav.ID))">
+                            <i class="fa fa-trash"></i> Remove
+                        </button>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="favourites-list">
+            @foreach (var fav in Favourites)
+            {
+                <div class="favourite-list-row clickable" @onclick="@(() => ShowDetails(fav))">
+                    <img src="@fav.SmallThumbnail" alt="@fav.Title" class="fav-list-thumb" />
+                    <span class="title">@fav.Title</span>
+                    <span class="author ms-2">@fav.Author</span>
+                    <span class="ms-auto">
+                        <button class="btn btn-link btn-sm" @onclick:stopPropagation @onclick="@(() => OpenAmazon(fav))">
+                            <i class="fa fa-amazon"></i>
+                        </button>
+                        <button class="btn btn-link btn-sm text-danger" @onclick:stopPropagation @onclick="@(() => RemoveFavourite(fav.ID))">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </span>
+                </div>
+            }
+        </div>
+    }
+}
+
+@if (SelectedFavourite != null)
+{
+    <div class="modal show d-block" tabindex="-1" style="background:rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@SelectedFavourite.Title</h5>
+                    <button type="button" class="btn-close" @onclick="CloseDetails"></button>
+                </div>
+                <div class="modal-body">
+                    <img src="@SelectedFavourite.Thumbnail" alt="@SelectedFavourite.Title" style="max-width:100px;float:left;margin-right:10px;" />
+                    <dl>
+                        <dt>Author</dt>
+                        <dd>@SelectedFavourite.Author</dd>
+                        <dt>Published Date</dt>
+                        <dd>@SelectedFavourite.PublishedDate</dd>
+                        <dt>Genre</dt>
+                        <dd>@SelectedFavourite.Genre</dd>
+                        <dt>Description</dt>
+                        <dd>@SelectedFavourite.Description</dd>
+                    </dl>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-warning" @onclick="() => OpenAmazon(SelectedFavourite)">
+                        <i class="fa fa-amazon"></i> Buy on Amazon
+                    </button>
+                    <button class="btn btn-secondary" @onclick="CloseDetails">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}

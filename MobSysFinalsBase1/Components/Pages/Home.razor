@@ -92,6 +92,18 @@ else if (BooksForPage is not null)
                     <button class="btn btn-warning" @onclick="OpenAmazon">
                         <i class="fa fa-amazon"></i> Buy on Amazon
                     </button>
+                    @if (!IsBookFavourited)
+                    {
+                        <button class="btn btn-outline-danger" @onclick="AddToFavourites">
+                            <i class="fa fa-heart"></i> Add to Favourites
+                        </button>
+                    }
+                    else
+                    {
+                        <button class="btn btn-danger" @onclick="RemoveFromFavourites">
+                            <i class="fa fa-heart"></i> Remove from Favourites
+                        </button>
+                    }
                     <button class="btn btn-secondary" @onclick="CloseDetails">Close</button>
                 </div>
             </div>
