@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using MobSysFinalsBase1.Shared;
+using MobSysFinalsBase1.Services;
 using MobSysFinalsBase1.Models;
 using System;
 using System.Collections.Generic;
@@ -21,13 +22,21 @@ namespace MobSysFinalsBase1.Components.Pages
         [Inject]
         public DatabaseContext DB { get; set; }
 
+        [Inject]
+        public BookService BookService { get; set; }
+
         public HomeViewModel Model { get; set; }
+
+        public bool IsGridView { get; set; } = true;
+        public int _page = 1;
+        public bool IsLoading = false;
+        public List<string> BookGenres;
+        public List<BookInfo> BooksForPage;
 
         protected override async void OnInitialized()
         {
             Model = new HomeViewModel();
 
-            // Check if user is logged in
             var loggedUser = AppShell.GetSessionUser();
             if (loggedUser != null)
             {
@@ -40,17 +49,17 @@ namespace MobSysFinalsBase1.Components.Pages
                 return;
             }
 
-            // Parse query string for status and message
             var queryParams = ParseQueryString(Nav.Uri);
             if (queryParams.TryGetValue("status", out var status))
                 Status = status;
             if (queryParams.TryGetValue("message", out var msg))
                 StatusMessage = msg;
 
+            BookGenres = BookService.Genres;
+            await LoadBooks();
             await InvokeAsync(StateHasChanged);
         }
 
-        // Simple built-in query string parser (no dependencies!)
         private Dictionary<string, string> ParseQueryString(string uri)
         {
             var result = new Dictionary<string, string>();
@@ -71,6 +80,41 @@ namespace MobSysFinalsBase1.Components.Pages
                 }
             }
             return result;
+        }
+
+        public void SetGrid(bool grid)
+        {
+            IsGridView = grid;
+        }
+
+        public async Task LoadBooks()
+        {
+            IsLoading = true;
+            StateHasChanged();
+            var randomGenres = BookService.GetRandomGenres(3);
+            var books = new List<BookInfo>();
+            foreach (var genre in randomGenres)
+            {
+                var booksForGenre = await BookService.GetBooksForGenre(genre, 3);
+                books.AddRange(booksForGenre);
+            }
+            BooksForPage = books;
+            IsLoading = false;
+            StateHasChanged();
+        }
+
+        public async Task NextPage()
+        {
+            _page++;
+            await LoadBooks();
+        }
+        public async Task PrevPage()
+        {
+            if (_page > 1)
+            {
+                _page--;
+                await LoadBooks();
+            }
         }
     }
 }
