@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using MobSysFinalsBase1.Shared;
-using MobSysFinalsBase1.Services;
 using MobSysFinalsBase1.Models;
+using MobSysFinalsBase1.Services;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -13,25 +13,18 @@ namespace MobSysFinalsBase1.Components.Pages
         public string Status { get; set; } = "";
         public string StatusMessage { get; set; } = "";
 
-        [Inject]
-        public AppShellContext AppShell { get; set; }
-
-        [Inject]
-        public NavigationManager Nav { get; set; }
-
-        [Inject]
-        public DatabaseContext DB { get; set; }
-
-        [Inject]
-        public BookService BookService { get; set; }
+        [Inject] public AppShellContext AppShell { get; set; }
+        [Inject] public NavigationManager Nav { get; set; }
+        [Inject] public DatabaseContext DB { get; set; }
+        [Inject] public BookService BookService { get; set; }
 
         public HomeViewModel Model { get; set; }
-
         public bool IsGridView { get; set; } = true;
         public int _page = 1;
         public bool IsLoading = false;
         public List<string> BookGenres;
         public List<BookInfo> BooksForPage;
+        public BookInfo SelectedBook { get; set; }
 
         protected override async void OnInitialized()
         {
@@ -95,7 +88,7 @@ namespace MobSysFinalsBase1.Components.Pages
             var books = new List<BookInfo>();
             foreach (var genre in randomGenres)
             {
-                var booksForGenre = await BookService.GetBooksForGenre(genre, 3);
+                var booksForGenre = await BookService.GetBooksForGenreWithRetry(genre, 3);
                 books.AddRange(booksForGenre);
             }
             BooksForPage = books;
@@ -115,6 +108,23 @@ namespace MobSysFinalsBase1.Components.Pages
                 _page--;
                 await LoadBooks();
             }
+        }
+
+        public void ShowDetails(BookInfo book)
+        {
+            SelectedBook = book;
+            StateHasChanged();
+        }
+        public void CloseDetails()
+        {
+            SelectedBook = null;
+            StateHasChanged();
+        }
+        public void OpenAmazon()
+        {
+            if (SelectedBook == null) return;
+            var amazonLink = $"https://www.amazon.com/s?k={Uri.EscapeDataString(SelectedBook.Title + " " + SelectedBook.Author)}&i=stripbooks";
+            Nav.NavigateTo(amazonLink, true);
         }
     }
 }

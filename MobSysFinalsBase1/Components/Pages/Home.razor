@@ -34,7 +34,7 @@ else if (BooksForPage is not null)
         <div class="book-grid">
             @foreach(var book in BooksForPage)
             {
-                <div class="book-card">
+                <div class="book-card clickable" @onclick="() => ShowDetails(book)">
                     <img src="@book.Thumbnail" alt="@book.Title" />
                     <div class="title">@book.Title</div>
                     <div class="author">@book.Author</div>
@@ -47,7 +47,7 @@ else if (BooksForPage is not null)
         <div class="book-list">
             @foreach(var book in BooksForPage)
             {
-                <div class="book-list-row">
+                <div class="book-list-row clickable" @onclick="() => ShowDetails(book)">
                     <img src="@book.SmallThumbnail" alt="@book.Title" />
                     <span class="title">@book.Title</span>
                     <span class="author ms-2">@book.Author</span>
@@ -62,3 +62,40 @@ else if (BooksForPage is not null)
         <button class="btn btn-secondary" @onclick="NextPage">Next</button>
     </div>
 }
+
+@if (SelectedBook != null)
+{
+    <div class="modal show d-block" tabindex="-1" style="background:rgba(0,0,0,0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@SelectedBook.Title</h5>
+                    <button type="button" class="btn-close" @onclick="CloseDetails"></button>
+                </div>
+                <div class="modal-body">
+                    <img src="@(IsGridView ? SelectedBook.Thumbnail : SelectedBook.SmallThumbnail)" alt="@SelectedBook.Title" style="max-width:100px;float:left;margin-right:10px;" />
+                    <dl>
+                        <dt>Author</dt>
+                        <dd>@SelectedBook.Author</dd>
+                        <dt>Published Date</dt>
+                        <dd>@SelectedBook.PublishedDate</dd>
+                        <dt>Genre</dt>
+                        <dd>@SelectedBook.Genre</dd>
+                        @if (!string.IsNullOrWhiteSpace(SelectedBook.Description))
+                        {
+                            <dt>Description</dt>
+                            <dd>@SelectedBook.Description</dd>
+                        }
+                    </dl>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-warning" @onclick="OpenAmazon">
+                        <i class="fa fa-amazon"></i> Buy on Amazon
+                    </button>
+                    <button class="btn btn-secondary" @onclick="CloseDetails">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+

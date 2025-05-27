@@ -23,7 +23,7 @@ namespace MobSysFinalsBase1.Services
 
         public async Task<List<BookInfo>> GetBooksForGenre(string genre, int count)
         {
-            var url = $"https://www.googleapis.com/books/v1/volumes?q=subject:{Uri.EscapeDataString(genre)}&maxResults={count}";
+            var url = $"https://www.googleapis.com/books/v1/volumes?q=subject:{Uri.EscapeDataString(genre)}&maxResults={count * 4}";
             using var client = new System.Net.Http.HttpClient();
             var response = await client.GetAsync(url);
             if (!response.IsSuccessStatusCode)
@@ -53,17 +53,41 @@ namespace MobSysFinalsBase1.Services
                             smallThumbnail = st.GetString() ?? "";
                     }
 
-                    books.Add(new BookInfo
+                    string description = volumeInfo.TryGetProperty("description", out var desc) ? desc.GetString() ?? "" : "";
+                    string publishedDate = volumeInfo.TryGetProperty("publishedDate", out var pd) ? pd.GetString() ?? "" : "";
+
+                    if (!string.IsNullOrEmpty(thumbnail))
                     {
-                        Title = title,
-                        Author = author,
-                        Thumbnail = thumbnail,
-                        SmallThumbnail = smallThumbnail
-                    });
+                        books.Add(new BookInfo
+                        {
+                            Title = title,
+                            Author = author,
+                            Thumbnail = thumbnail,
+                            SmallThumbnail = string.IsNullOrEmpty(smallThumbnail) ? thumbnail : smallThumbnail,
+                            PublishedDate = publishedDate,
+                            Genre = genre,
+                            Description = description
+                        });
+                    }
+
+                    if (books.Count >= count)
+                        break;
                 }
             }
-
             return books;
+        }
+
+        public async Task<List<BookInfo>> GetBooksForGenreWithRetry(string genre, int count, int maxTries = 6)
+        {
+            int tries = 0;
+            while (tries < maxTries)
+            {
+                var books = await GetBooksForGenre(genre, count);
+                if (books.Count == count)
+                    return books;
+                tries++;
+            }
+            return new List<BookInfo>();
         }
     }
 
@@ -73,5 +97,8 @@ namespace MobSysFinalsBase1.Services
         public string Author { get; set; } = "";
         public string Thumbnail { get; set; } = "";
         public string SmallThumbnail { get; set; } = "";
+        public string PublishedDate { get; set; } = "";
+        public string Genre { get; set; } = "";
+        public string Description { get; set; } = "";
     }
 }

@@ -557,7 +557,6 @@ article section:not(:first-child) {
     box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
     background: #fff;
 }
-
 .book-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -573,6 +572,7 @@ article section:not(:first-child) {
     border-radius: 8px;
     padding: 8px;
     box-shadow: 0 2px 8px #0002;
+    cursor: pointer;
 }
 
     .book-card img {
@@ -608,6 +608,7 @@ article section:not(:first-child) {
     border-radius: 8px;
     padding: 8px 16px;
     box-shadow: 0 2px 8px #0001;
+    cursor: pointer;
 }
 
     .book-list-row img {
