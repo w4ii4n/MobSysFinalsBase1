@@ -51,12 +51,12 @@ namespace MobSysFinalsBase1.Components.Pages
                 if (targetUser != null)
                 {
                     Status = "success";
-                    StatusMessage = "User changes has been saved successfully!";
+                    StatusMessage = "Logged in Successfully!";
                     AppShell.CurrentUser = targetUser;
                     AppShell.IsUserLoggedIn = true;
                     AppShell.SetSessionUser(targetUser);
                     await InvokeAsync(StateHasChanged);
-                    Nav.NavigateTo("/");
+                    Nav.NavigateTo("/?status=success&message=Logged%20in%20Successfully!");
                 }
                 else
                 {

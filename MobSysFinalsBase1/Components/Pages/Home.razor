@@ -1,15 +1,23 @@
 ﻿@page "/"
+
+@if (!string.IsNullOrWhiteSpace(StatusMessage))
+{
+    <div class="alert alert-@Status d-flex align-items-center" role="alert">
+        <i class="fa fa-info-circle me-2"></i>
+        <span>@StatusMessage</span>
+    </div>
+}
+
 <SectionContent SectionName="page-buttons">
     <div id="searchBox" class="input-group header-search" style="display:none;">
         <span class="input-group-text text-warning"><i class="fa fa-search"></i></span>
-        <input id="txtSearch" type="text" class="form-control" placeholder="Search" value="@Model.Search" @onchange="SearchTerm" />
         <span class="input-group-text" onclick="hideSearchBox()"><i class="fa fa-times"></i></span>
     </div>
     <span id="controlBox">
         <button class="btn text-warning" onclick="showSearchBox()">
             <i class="fa fa-search"></i>
         </button>
-    </span>    
+    </span>
 </SectionContent>
 <section>
     <h1>Welcome</h1>

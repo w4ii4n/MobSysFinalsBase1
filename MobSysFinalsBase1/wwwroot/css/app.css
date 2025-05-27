@@ -529,3 +529,31 @@ article section:not(:first-child) {
     border:none;
     /*box-shadow:0px 0px 8px #CCC;*/
 }
+
+.login-bg {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-card {
+    border-radius: 1.5rem;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+    background: #fff;
+}
+
+.register-bg {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.register-card {
+    border-radius: 1.5rem;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+    background: #fff;
+}
