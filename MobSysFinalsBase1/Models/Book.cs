@@ -3,12 +3,10 @@ using System;
 
 namespace MobSysFinalsBase1.Models
 {
-    public class Favourite
+    public class Book
     {
         [PrimaryKey, AutoIncrement]
         public int ID { get; set; }
-        [NotNull]
-        public int UserID { get; set; }
         [NotNull]
         public string Title { get; set; }
         [NotNull]

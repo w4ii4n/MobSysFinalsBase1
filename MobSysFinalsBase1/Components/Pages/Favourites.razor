@@ -28,9 +28,10 @@ else
             @foreach (var fav in Favourites)
             {
                 <div class="favourite-card clickable" @onclick="@(() => ShowDetails(fav))">
-                    <img src="@fav.Thumbnail" alt="@fav.Title" class="fav-thumb" />
+                    <img src="@fav.CoverImagePath" alt="@fav.Title" class="fav-thumb" />
                     <div class="title">@fav.Title</div>
                     <div class="author">@fav.Author</div>
+                    <div class="genre">@fav.Genre</div>
                     <div class="mt-2">
                         <button class="btn btn-link btn-sm" @onclick:stopPropagation @onclick="@(() => OpenAmazon(fav))">
                             <i class="fa fa-amazon"></i> Buy
@@ -49,9 +50,10 @@ else
             @foreach (var fav in Favourites)
             {
                 <div class="favourite-list-row clickable" @onclick="@(() => ShowDetails(fav))">
-                    <img src="@fav.SmallThumbnail" alt="@fav.Title" class="fav-list-thumb" />
+                    <img src="@fav.CoverImagePath" alt="@fav.Title" class="fav-list-thumb" />
                     <span class="title">@fav.Title</span>
                     <span class="author ms-2">@fav.Author</span>
+                    <span class="genre ms-2 text-muted">@fav.Genre</span>
                     <span class="ms-auto">
                         <button class="btn btn-link btn-sm" @onclick:stopPropagation @onclick="@(() => OpenAmazon(fav))">
                             <i class="fa fa-amazon"></i>
@@ -76,7 +78,7 @@ else
                     <button type="button" class="btn-close" @onclick="CloseDetails"></button>
                 </div>
                 <div class="modal-body">
-                    <img src="@SelectedFavourite.Thumbnail" alt="@SelectedFavourite.Title" style="max-width:100px;float:left;margin-right:10px;" />
+                    <img src="@SelectedFavourite.CoverImagePath" alt="@SelectedFavourite.Title" style="max-width:100px;float:left;margin-right:10px;" />
                     <dl>
                         <dt>Author</dt>
                         <dd>@SelectedFavourite.Author</dd>

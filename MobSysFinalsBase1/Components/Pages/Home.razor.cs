@@ -2,35 +2,32 @@
 using MobSysFinalsBase1.Shared;
 using MobSysFinalsBase1.Models;
 using MobSysFinalsBase1.Services;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System;
 
 namespace MobSysFinalsBase1.Components.Pages
 {
     public partial class Home : ComponentBase
     {
-        public string Status { get; set; } = "";
-        public string StatusMessage { get; set; } = "";
-
         [Inject] public AppShellContext AppShell { get; set; }
         [Inject] public NavigationManager Nav { get; set; }
         [Inject] public DatabaseContext DB { get; set; }
         [Inject] public BookService BookService { get; set; }
 
-        public HomeViewModel Model { get; set; }
         public bool IsGridView { get; set; } = true;
-        public int _page = 1;
-        public bool IsLoading = false;
-        public List<string> BookGenres;
-        public List<BookInfo> BooksForPage;
-        public BookInfo SelectedBook { get; set; }
+        public bool IsLoading { get; set; } = false;
+        public List<Book> BooksForPage { get; set; }
+        public Book SelectedBook { get; set; }
         public bool IsBookFavourited { get; set; }
 
-        protected override async void OnInitialized()
+        public void GoToBooks()
         {
-            Model = new HomeViewModel();
+            Nav.NavigateTo("/books");
+        }
 
+        protected override async Task OnInitializedAsync()
+        {
             var loggedUser = AppShell.GetSessionUser();
             if (loggedUser != null)
             {
@@ -43,37 +40,7 @@ namespace MobSysFinalsBase1.Components.Pages
                 return;
             }
 
-            var queryParams = ParseQueryString(Nav.Uri);
-            if (queryParams.TryGetValue("status", out var status))
-                Status = status;
-            if (queryParams.TryGetValue("message", out var msg))
-                StatusMessage = msg;
-
-            BookGenres = BookService.Genres;
             await LoadBooks();
-            await InvokeAsync(StateHasChanged);
-        }
-
-        private Dictionary<string, string> ParseQueryString(string uri)
-        {
-            var result = new Dictionary<string, string>();
-            var queryIndex = uri.IndexOf('?');
-            if (queryIndex >= 0 && queryIndex < uri.Length - 1)
-            {
-                var query = uri.Substring(queryIndex + 1);
-                var pairs = query.Split('&', StringSplitOptions.RemoveEmptyEntries);
-                foreach (var pair in pairs)
-                {
-                    var kvp = pair.Split('=', 2);
-                    if (kvp.Length == 2)
-                    {
-                        var key = Uri.UnescapeDataString(kvp[0]);
-                        var value = Uri.UnescapeDataString(kvp[1]);
-                        result[key] = value;
-                    }
-                }
-            }
-            return result;
         }
 
         public void SetGrid(bool grid)
@@ -85,33 +52,12 @@ namespace MobSysFinalsBase1.Components.Pages
         {
             IsLoading = true;
             StateHasChanged();
-            var randomGenres = BookService.GetRandomGenres(3);
-            var books = new List<BookInfo>();
-            foreach (var genre in randomGenres)
-            {
-                var booksForGenre = await BookService.GetBooksForGenreWithRetry(genre, 3);
-                books.AddRange(booksForGenre);
-            }
-            BooksForPage = books;
+            BooksForPage = await BookService.GetBooks();
             IsLoading = false;
             StateHasChanged();
         }
 
-        public async Task NextPage()
-        {
-            _page++;
-            await LoadBooks();
-        }
-        public async Task PrevPage()
-        {
-            if (_page > 1)
-            {
-                _page--;
-                await LoadBooks();
-            }
-        }
-
-        public async void ShowDetails(BookInfo book)
+        public async void ShowDetails(Book book)
         {
             SelectedBook = book;
             var user = AppShell.GetSessionUser();
@@ -136,7 +82,9 @@ namespace MobSysFinalsBase1.Components.Pages
         public void OpenAmazon()
         {
             if (SelectedBook == null) return;
-            var amazonLink = $"https://www.amazon.com/s?k={Uri.EscapeDataString(SelectedBook.Title + " " + SelectedBook.Author)}&i=stripbooks";
+            var amazonLink = !string.IsNullOrWhiteSpace(SelectedBook.AmazonLink)
+                ? SelectedBook.AmazonLink
+                : $"https://www.amazon.com/s?k={Uri.EscapeDataString(SelectedBook.Title + " " + SelectedBook.Author)}&i=stripbooks";
             Nav.NavigateTo(amazonLink, true);
         }
 
@@ -153,9 +101,8 @@ namespace MobSysFinalsBase1.Components.Pages
                     PublishedDate = SelectedBook.PublishedDate,
                     Genre = SelectedBook.Genre,
                     Description = SelectedBook.Description,
-                    AmazonLink = $"https://www.amazon.com/s?k={Uri.EscapeDataString(SelectedBook.Title + " " + SelectedBook.Author)}&i=stripbooks",
-                    Thumbnail = SelectedBook.Thumbnail,
-                    SmallThumbnail = SelectedBook.SmallThumbnail,
+                    AmazonLink = SelectedBook.AmazonLink,
+                    CoverImagePath = SelectedBook.CoverImagePath,
                     AddedDate = DateTime.Now
                 };
                 await DB.AddFavourite(fav);
@@ -177,6 +124,15 @@ namespace MobSysFinalsBase1.Components.Pages
                     StateHasChanged();
                 }
             }
+        }
+
+        public async void DeleteBook()
+        {
+            if (SelectedBook == null) return;
+            await DB.DeleteBook(SelectedBook.ID);
+            await LoadBooks();
+            SelectedBook = null;
+            StateHasChanged();
         }
     }
 }

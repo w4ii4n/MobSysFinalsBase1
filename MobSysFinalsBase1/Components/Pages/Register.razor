@@ -1,7 +1,5 @@
 ﻿@page "/register"
 
-
-
 <div class="register-bg">
     <div class="card register-card p-4" style="max-width: 430px; width: 100%;">
         <div class="text-center mb-4">
@@ -47,26 +45,11 @@
                     <InputText id="lastname" class="form-control" @bind-Value="Model.LastName" placeholder="Enter last name" required />
                 </div>
             </div>
-            <div class="mb-3">
-                <label for="mobile" class="form-label">Mobile</label>
-                <div class="input-group">
-                    <span class="input-group-text"><i class="fas fa-mobile-alt"></i></span>
-                    <InputText id="mobile" class="form-control" @bind-Value="Model.MobileNumber" placeholder="Enter mobile number" required />
-                </div>
-            </div>
-            <div class="mb-3">
-                <label for="address" class="form-label">Address</label>
-                <div class="input-group">
-                    <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
-                    <InputTextArea id="address" class="form-control" @bind-Value="Model.Address" placeholder="Enter address" rows="2" required />
-                </div>
-            </div>
             <div class="d-grid mb-2">
                 <button type="submit" class="btn btn-warning btn-lg">
                     <i class="fas fa-user-plus"></i> Register
                 </button>
             </div>
         </EditForm>
-      
     </div>
 </div>

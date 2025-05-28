@@ -1,0 +1,129 @@
+﻿@page "/books"
+@inherits MobSysFinalsBase1.Components.Pages.BooksPage
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Your Books (@(Books?.Count ?? 0))</h2>
+    <button class="btn btn-success" @onclick="ShowAddDialog">
+        <i class="fa fa-plus"></i> Add Book
+    </button>
+</div>
+
+<div class="d-flex justify-content-end mb-3">
+    <button class="btn btn-outline-secondary me-1" disabled="@IsGridView" @onclick="()=>SetGrid(true)">
+        <i class="fa fa-th"></i> Grid
+    </button>
+    <button class="btn btn-outline-secondary" disabled="@(IsGridView == false)" @onclick="()=>SetGrid(false)">
+        <i class="fa fa-list"></i> List
+    </button>
+</div>
+
+@if (IsLoading)
+{
+        <p>Loading books...</p>
+}
+else if (Books == null || Books.Count == 0)
+{
+        <p>No books found.</p>
+}
+else
+{
+    @if (IsGridView)
+    {
+                <div class="row row-cols-1 row-cols-md-3 g-4">
+            @foreach (var book in Books)
+            {
+                            <div class="col">
+                                <div class="card h-100 clickable" @onclick="@(() => ShowEditDialog(book))">
+                                    <img src="@book.CoverImagePath" class="card-img-top" alt="@book.Title" style="height:220px;object-fit:cover;" />
+                                    <div class="card-body">
+                                        <h5 class="card-title">@book.Title</h5>
+                                        <p class="card-text mb-1"><strong>Author:</strong> @book.Author</p>
+                                        <span class="badge bg-info text-dark">@book.Genre</span>
+                                    </div>
+                                </div>
+                            </div>
+            }
+                </div>
+    }
+    else
+    {
+                <ul class="list-group">
+            @foreach (var book in Books)
+            {
+                            <li class="list-group-item d-flex align-items-center clickable" @onclick="@(() => ShowEditDialog(book))">
+                                <img src="@book.CoverImagePath" alt="@book.Title" class="rounded" style="width:48px;height:48px;object-fit:cover;margin-right:1rem;" />
+                                <div>
+                                    <div class="fw-bold">@book.Title</div>
+                                    <div class="text-muted small">@book.Author &mdash; <span class="badge bg-info text-dark">@book.Genre</span></div>
+                                </div>
+                            </li>
+            }
+                </ul>
+    }
+}
+
+@if (ShowBookDialog)
+{
+        <div class="modal show d-block" tabindex="-1" style="background:rgba(0,0,0,0.5);">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">@((BookForm.ID == 0 ? "Add" : "Edit") + " Book")</h5>
+                        <button type="button" class="btn-close" @onclick="CloseBookDialog"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-2">
+                            <label>Title</label>
+                            <input class="form-control" @bind="BookForm.Title" />
+                        </div>
+                        <div class="mb-2">
+                            <label>Author</label>
+                            <input class="form-control" @bind="BookForm.Author" />
+                        </div>
+                        <div class="mb-2">
+                            <label>Genre</label>
+                            <input class="form-control" @bind="BookForm.Genre" />
+                        </div>
+                        <div class="mb-2">
+                            <label>Published Date</label>
+                            <input class="form-control" @bind="BookForm.PublishedDate" />
+                        </div>
+                        <div class="mb-2">
+                            <label>Description</label>
+                            <textarea class="form-control" @bind="BookForm.Description"></textarea>
+                        </div>
+                        <div class="mb-2">
+                            <label>Cover Picture</label>
+                            <InputFile OnChange="OnFileChanged" accept="image/*" />
+                        @if (!string.IsNullOrEmpty(BookForm.CoverImagePath))
+                        {
+                                    <img src="@BookForm.CoverImagePath" alt="Cover" style="max-width:80px;margin-top:5px;" />
+                        }
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-success" @onclick="SaveBook">Save</button>
+                    @if (BookForm.ID != 0)
+                    {
+                                <button class="btn btn-danger" @onclick="DeleteBook">
+                                    <i class="fa fa-trash"></i> Delete
+                                </button>
+                    }
+                        <button class="btn btn-secondary" @onclick="CloseBookDialog">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+}
+
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    <div class="toast @(_showToast ? "show" : "")" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <strong class="me-auto text-success">Success</strong>
+            <button type="button" class="btn-close" @onclick="HideToast"></button>
+        </div>
+        <div class="toast-body">
+            Book added successfully!
+        </div>
+    </div>
+</div>

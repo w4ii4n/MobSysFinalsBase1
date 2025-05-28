@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using MobSysFinalsBase1.Services;
 using MobSysFinalsBase1.Shared;
 
 namespace MobSysFinalsBase1
@@ -23,6 +24,7 @@ namespace MobSysFinalsBase1
 #endif
             builder.Services.AddSingleton<AppShellContext>();
             builder.Services.AddSingleton<DatabaseContext>();
+            builder.Services.AddSingleton<BookService>();
             return builder.Build();
         }
     }

@@ -29,23 +29,15 @@ namespace MobSysFinalsBase1.Components.Pages
         {
             try
             {
-                // Ensure no nulls for required fields
                 Model.Username = Model.Username ?? "";
                 Model.Password = Model.Password ?? "";
-
-                Model.IsDeleted = false;
-                Model.CreatedBy = "SYSTEM";
-                Model.ModifiedBy = "SYSTEM";
-                Model.CreatedDate = DateTime.Now;
-                Model.ModifiedDate = DateTime.Now;
+                Model.FirstName = Model.FirstName ?? "";
+                Model.LastName = Model.LastName ?? "";
 
                 await DB.SaveUser(Model);
                 Status = "success";
                 StatusMessage = "User has been registered successfully!";
-
-                // Optionally clear the form
                 Model = new Models.User();
-
                 StateHasChanged();
             }
             catch (Exception ex)
